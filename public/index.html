@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Validator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+            color: #fff;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #6a11cb;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Password Validator</h1>
+        <input id="passwordInput" type="password" placeholder="Enter your password" />
+        <button onclick="validatePassword()">Validate Password</button>
+        <div id="message" class="message"></div>
+    </div>
+
+    <script>
+        async function validatePassword() {
+            const password = document.getElementById('passwordInput').value;
+            const messageElement = document.getElementById('message');
+
+            try {
+                const response = await fetch('http://localhost:5000/validate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+
+                if (response.ok) {
+                    const message = await response.json();
+                    messageElement.style.color = 'green';
+                    messageElement.textContent = message.message;
+                } else {
+                    const errorMessage = await response.json();
+                    messageElement.style.color = 'red';
+                    messageElement.innerHTML = `Invalid password! <br> State: ${errorMessage.state} <br> Reason: ${errorMessage.reason}`;
+                }
+            } catch (error) {
+                messageElement.style.color = 'rgb(100,30,50)';
+                messageElement.textContent = 'Error connecting to the server.';
+            }
+        }
+    </script>
+</body>
+</html>
